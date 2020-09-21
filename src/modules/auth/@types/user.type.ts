@@ -1,8 +1,8 @@
-import { EUserProfile } from './user-enum';
+import { EUserProfile } from './user.enum';
 
 export interface IUser {
   email: string;
-  phone: string;
+  mobile: string;
   pin: string;
   otp: string;
   otpExpiry: Date;
