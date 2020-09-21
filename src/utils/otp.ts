@@ -6,6 +6,6 @@ export function generateOtp(): string {
 }
 
 export function isExpired(otpExpiry: Date): boolean {
-  if (!otpExpiry) return false;
+  if (!otpExpiry) return true;
   return moment().isAfter(moment(otpExpiry));
 }
