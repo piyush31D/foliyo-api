@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { IMessage } from '../@types/chat-type';
+import { IMessage } from '../@types/chat.type';
 
 export type ChatMessageDocument = mongoose.Document & IMessage;
 

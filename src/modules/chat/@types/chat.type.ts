@@ -1,4 +1,4 @@
-import { IUser } from '../../auth/@types/user-type';
+import { IUser } from '../../auth/@types/user.type';
 
 export interface IChannel {
   channelType: string;

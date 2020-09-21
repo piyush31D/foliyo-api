@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { IChannel } from '../@types/chat-type';
+import { IChannel } from '../@types/chat.type';
 
 export type ChatChannelDocument = mongoose.Document & IChannel;
 
