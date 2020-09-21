@@ -21,12 +21,6 @@ const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use(expressjwt({ secret: config.jwtSecret, algorithms: ['HS256'] })
-  .unless({
-    path: [
-      '/api/auth/investor/signin'
-    ]
-  }));
 app.use(compress());
 app.use(methodOverride());
 
@@ -34,7 +28,16 @@ app.use(methodOverride());
 app.use(helmet());
 
 // enable CORS - Cross Origin Resource Sharing
-app.use(cors());
+app.use(cors()); //TODO: Configure it properly
+
+app.use(expressjwt({ secret: config.jwtSecret, algorithms: ['HS256'] })
+  .unless({
+    path: [
+      '/api/auth/user',
+      '/api/auth/otp',
+      '/api/auth/pin'
+    ]
+  }));
 
 // enable detailed API logging in dev env
 if (config.env === Environment.Development) {
@@ -71,7 +74,7 @@ if (config.env === Environment.Development) {
       });
 
       // Require all the message queues
-      const mqs = glob.sync(`${__dirname}/modules/**/mqs/*`);
+      const mqs = glob.sync(`${__dirname}/mqs/**/*`, { nodir: true });
       mqs.forEach((mq) => {
         require(mq);
       });
@@ -79,13 +82,12 @@ if (config.env === Environment.Development) {
       // if error is not an instanceOf APIError, convert it.
       app.use((err: Error | APIError | MongoError, _req: Request, res: Response, next: NextFunction) => {
         if (err.name === 'UnauthorizedError') {
-          return res.status(401).json({ success: false, message: 'Invalid token' });
+          return res.status(401).json({ success: false, message: 'Unauthorized request' });
         }
         if (err instanceof MongoError) {
           return next(new APIError(err.errmsg, httpStatus.INTERNAL_SERVER_ERROR));
         }
         return next(new APIError(err.message, httpStatus.BAD_REQUEST));
-
       });
 
       // catch 404 and forward to error handler
