@@ -55,7 +55,13 @@ const envSchema = Joi.object({
       then: Joi.number().default(10),
       otherwise: Joi.number().required()
         .description('Redis DB name')
-    })
+    }),
+  MSG91_AUTHKEY: Joi.string()
+    .required(),
+  MSG91_SENDERID: Joi.string()
+    .default('FOLIYO'),
+  MSG91_ROUTE: Joi.string()
+    .default('4')
 
 }).unknown().required();
 
@@ -74,5 +80,10 @@ export const config = {
     port: env.REDIS_PORT,
     password: env.REDIS_PASSWORD,
     db: env.REDIS_DB,
+  },
+  msg91: {
+    authKey: env.MSG91_AUTHKEY,
+    senderId: env.MSG91_SENDERID,
+    route: env.MSG91_ROUTE
   }
 };
