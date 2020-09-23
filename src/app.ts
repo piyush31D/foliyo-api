@@ -56,7 +56,6 @@ if (config.env === Environment.Development) {
     // Connect mongodb database
     await createMongoConnection();
 
-
     // Start server
     app.listen(config.port, () => {
       logger.info(`server started on port ${config.port} (${config.env})`);
@@ -83,6 +82,9 @@ if (config.env === Environment.Development) {
       app.use((err: Error | APIError | MongoError, _req: Request, res: Response, next: NextFunction) => {
         if (err.name === 'UnauthorizedError') {
           return res.status(401).json({ success: false, message: 'Unauthorized request' });
+        }
+        if (err instanceof APIError) {
+          return res.status(err.status).json({ success: false, message: err.message });
         }
         if (err instanceof MongoError) {
           return next(new APIError(err.errmsg, httpStatus.INTERNAL_SERVER_ERROR));
