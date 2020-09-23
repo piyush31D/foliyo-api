@@ -17,7 +17,14 @@ const envSchema = Joi.object({
   JWT_SECRET: Joi.string()
     .when('NODE_ENV', {
       is: Joi.string().equal(Environment.Development),
-      then: Joi.string().default('secret'),
+      then: Joi.string().default('jwtsecret'),
+      otherwise: Joi.string().required()
+        .description('JWT Secret required to sign')
+    }),
+  JWT_PIN_SECRET: Joi.string()
+    .when('NODE_ENV', {
+      is: Joi.string().equal(Environment.Development),
+      then: Joi.string().default('jwtpinsecret'),
       otherwise: Joi.string().required()
         .description('JWT Secret required to sign')
     }),
@@ -74,6 +81,7 @@ export const config = {
   port: env.PORT,
   mongooseDebug: env.MONGOOSE_DEBUG,
   jwtSecret: env.JWT_SECRET,
+  jwtPinSecret: env.JWT_PIN_SECRET,
   mongoUri: env.MONGO_URI,
   redis: {
     host: env.REDIS_HOST,

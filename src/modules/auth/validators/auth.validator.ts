@@ -1,4 +1,4 @@
-import Joi, { ValidationError } from '@hapi/joi';
+import Joi from '@hapi/joi';
 import validator from "validator";
 
 export const userSigninSchema = Joi.object({
@@ -27,5 +27,6 @@ export const createValidatePINSchema = Joi.object({
     }
     return value;
   }),
-  pin: Joi.string().required().length(6) //TODO: add regex for number validation
+  pin: Joi.string().required().length(6), //TODO: add regex for number validation
+  pinToken: Joi.string().required()
 }).unknown().required();

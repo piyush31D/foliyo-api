@@ -11,4 +11,6 @@ export interface IUser {
   profiles: EUserProfile[];
   roles: string[];
   permissions: string[];
+  lastSignIn?: Date;
+  lastOtpValidation?: Date;
 }

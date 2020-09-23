@@ -10,9 +10,12 @@ import {
   INVALID_PIN,
   OTP_EXPIRED,
   OTP_SENT,
+  OTP_VERIFICATION_REQUIRED,
   USER_NOT_FOUND
 } from '../../../const/auth/auth-error.const';
-import { generateToken } from '../utils/auth.util';
+import { generatePinToken, generateToken, validatePinToken } from '../utils/auth.util';
+import APIError from '../../../error';
+import httpStatus from 'http-status';
 
 export const userSignin = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -46,15 +49,19 @@ export const verifyOTP = async ({ body }: { body: { mobile: string, otp: string 
     const { mobile, otp } = body;
     const user = await User.findOne({ mobile });
     if (!user)
-      throw new Error(USER_NOT_FOUND)
+      throw new APIError(USER_NOT_FOUND, httpStatus.NOT_FOUND)
     if (isExpired(user.otpExpiry))
-      throw new Error(OTP_EXPIRED);
+      throw new APIError(OTP_EXPIRED, httpStatus.BAD_REQUEST);
     if (user && user.otp !== otp)
-      throw new Error(INVALID_OTP);
+      throw new APIError(INVALID_OTP, httpStatus.BAD_REQUEST);
+    user.lastOtpValidation = new Date();
+    const pinToken = generatePinToken(user);
+    await user.save();
     return res.json({
       success: true,
       data: {
-        pinExists: !!user.pin
+        pinExists: !!user.pin,
+        pinToken
       }
     });
   } catch (error) {
@@ -63,20 +70,28 @@ export const verifyOTP = async ({ body }: { body: { mobile: string, otp: string 
   }
 }
 
-export const setupPIN = async ({ body }: { body: { mobile: string, pin: string } }, res: Response, next: NextFunction) => {
+export const setupPIN = async ({ body }: { body: { mobile: string, pin: string, pinToken: string } }, res: Response, next: NextFunction) => {
   try {
     await createValidatePINSchema.validateAsync(body);
-    const { mobile, pin } = body;
+    const { mobile, pin, pinToken } = body;
+    try {
+      validatePinToken(pinToken);
+    } catch {
+      throw new APIError(OTP_VERIFICATION_REQUIRED, httpStatus.FORBIDDEN);
+    }
     const user = await User.findOne({ mobile });
     if (!user)
-      throw new Error(USER_NOT_FOUND)
+      throw new APIError(USER_NOT_FOUND, httpStatus.NOT_FOUND);
     user.pin = pin;
+    user.lastSignIn = new Date();
     await user.save();
     const { payload, token } = generateToken(user);
     return res.json({
       success: true,
-      token,
-      data: payload
+      data: {
+        user: payload,
+        token
+      }
     });
   } catch (error) {
     logger.error(error.message);
@@ -84,22 +99,31 @@ export const setupPIN = async ({ body }: { body: { mobile: string, pin: string }
   }
 }
 
-export const verifyPIN = async ({ body }: { body: { mobile: string, pin: string } }, res: Response, next: NextFunction) => {
+export const verifyPIN = async ({ body }: { body: { mobile: string, pin: string, pinToken: string } }, res: Response, next: NextFunction) => {
   try {
     await createValidatePINSchema.validateAsync(body);
-    const { mobile, pin } = body;
+    const { mobile, pin, pinToken } = body;
+    try {
+      validatePinToken(pinToken);
+    } catch {
+      throw new APIError(OTP_VERIFICATION_REQUIRED, httpStatus.FORBIDDEN);
+    }
     const user = await User.findOne({ mobile });
     if (!user)
-      throw new Error(USER_NOT_FOUND);
+      throw new APIError(USER_NOT_FOUND, httpStatus.NOT_FOUND);
     const validPIN = await user.comparePin(pin);
     if (!validPIN) {
-      throw new Error(INVALID_PIN)
+      throw new APIError(INVALID_PIN, httpStatus.BAD_REQUEST)
     }
+    user.lastSignIn = new Date();
+    await user.save();
     const { payload, token } = generateToken(user);
     return res.json({
       success: true,
-      token,
-      data: payload
+      data: {
+        user: payload,
+        token
+      }
     });
   } catch (error) {
     logger.error(error.message);

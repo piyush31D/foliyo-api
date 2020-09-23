@@ -21,6 +21,8 @@ const userSchema = new mongoose.Schema({
   pin: String,
   otp: String,
   otpExpiry: Date,
+  lastSignIn: Date,
+  lastOtpValidation: Date,
   emailVerified: {
     type: Boolean,
     default: false
