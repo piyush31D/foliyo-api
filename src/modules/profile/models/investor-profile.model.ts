@@ -4,6 +4,11 @@ import { IInvestor } from '../@types/investor-type';
 export type InvestorDocument = mongoose.Document & IInvestor
 
 const investorSchema = new mongoose.Schema({
+  user: {
+    type: mongoose.Types.ObjectId,
+    ref: 'User',
+    unique: true
+  },
   firstName: {
     type: String,
     required: true
@@ -13,13 +18,12 @@ const investorSchema = new mongoose.Schema({
     required: true
   },
   gender: {
-    type: String,
-    required: true
+    type: String
   },
   picture: {
     type: String,
   },
-  phone: {
+  mobile: {
     type: String,
     required: true
   },
@@ -28,26 +32,21 @@ const investorSchema = new mongoose.Schema({
     required: true
   },
   residence: {
-    type: String,
-    required: true
+    type: String
   },
   occupationDetails: {
     sector: {
-      type: String,
-      required: true
+      type: String
     },
     salaryRange: {
-      type: String,
-      required: true
+      type: String
     }
   },
   fathersName: {
-    type: String,
-    required: true
+    type: String
   },
   mothersName: {
-    type: String,
-    required: true
+    type: String
   },
   pan: {
     type: String,

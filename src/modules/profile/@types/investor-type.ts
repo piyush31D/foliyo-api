@@ -1,9 +1,10 @@
 export interface IInvestor {
+  user: string;
   firstName: string;
   lastName: string;
   gender: string;
   picture: string;
-  phone: string;
+  mobile: string;
   email: string;
   residence: string;
   occupationDetails: IOccupation;
