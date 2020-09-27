@@ -1,13 +1,14 @@
 export interface IAdvisor {
+  user: string;
   pan: string;
   regNumber: string;
   authority: string;
   isVerified: boolean;
   picture: string;
-  phone: string;
+  mobile: string;
   email: string;
   residence: string;
-  category: string;
+  category: AdvisorCategory;
   offerings: string[];
   rating: number;
   individualDetails: IIndividual;
@@ -30,4 +31,9 @@ export interface IAddress {
   city: string;
   state: string;
   country: string;
+}
+
+export enum AdvisorCategory {
+  INDIVIDUAL = "INDIVIDUAL",
+  COMPANY = "COMPANY"
 }

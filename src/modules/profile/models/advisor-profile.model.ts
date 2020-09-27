@@ -1,9 +1,14 @@
 import mongoose from "mongoose";
-import { IAdvisor } from '../@types/advisor-type';
+import { AdvisorCategory, IAdvisor } from '../@types/advisor-type';
 
 export type AdvisorDocument = mongoose.Document & IAdvisor
 
 const advisorSchema = new mongoose.Schema({
+  user: {
+    type: mongoose.Types.ObjectId,
+    ref: 'User',
+    unique: true
+  },
   pan: {
     type: String,
   },
@@ -21,7 +26,7 @@ const advisorSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  phone: {
+  mobile: {
     type: String,
     required: true
   },
@@ -36,6 +41,7 @@ const advisorSchema = new mongoose.Schema({
   category: {
     type: String,
     required: true,
+    default: AdvisorCategory.INDIVIDUAL
   },
   offerings: [String],
   rating: Number,
