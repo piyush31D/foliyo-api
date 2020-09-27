@@ -12,7 +12,7 @@ import {
   OTP_SENT,
   OTP_VERIFICATION_REQUIRED,
   USER_NOT_FOUND
-} from '../../../const/auth/auth-error.const';
+} from '../../../const/auth/auth-message.const';
 import { generatePinToken, generateToken, validatePinToken } from '../utils/auth.util';
 import APIError from '../../../error';
 import httpStatus from 'http-status';
