@@ -1,32 +1,17 @@
 import Joi from '@hapi/joi';
-import validator from "validator";
+import { customMobileValidator } from '../../../utils/validator';
 
 export const userSigninSchema = Joi.object({
-  mobile: Joi.string().custom((value, helper) => {
-    if (!validator.isMobilePhone(value, 'en-IN')) {
-      return helper.error('any.invalid');
-    }
-    return value;
-  })
+  mobile: Joi.string().custom(customMobileValidator)
 }).unknown().required();
 
 export const verifyOTPSchema = Joi.object({
-  mobile: Joi.string().custom((value, helper) => {
-    if (!validator.isMobilePhone(value, 'en-IN')) {
-      return helper.error('any.invalid');
-    }
-    return value;
-  }),
+  mobile: Joi.string().custom(customMobileValidator),
   otp: Joi.string().required().length(6) //TODO: add regex for number validation
 }).unknown().required();
 
 export const createValidatePINSchema = Joi.object({
-  mobile: Joi.string().custom((value, helper) => {
-    if (!validator.isMobilePhone(value, 'en-IN')) {
-      return helper.error('any.invalid');
-    }
-    return value;
-  }),
+  mobile: Joi.string().custom(customMobileValidator),
   pin: Joi.string().required().length(6), //TODO: add regex for number validation
   pinToken: Joi.string().required()
 }).unknown().required();
