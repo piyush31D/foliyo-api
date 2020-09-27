@@ -11,12 +11,10 @@ type comparePinFunction = (pin: string) => Promise<boolean>;
 
 const userSchema = new mongoose.Schema({
   email: {
-    type: String,
-    unique: true
+    type: String
   },
   mobile: {
-    type: String,
-    unique: true
+    type: String
   },
   pin: String,
   otp: String,
@@ -73,6 +71,8 @@ const comparePin: comparePinFunction = function (pin) {
 };
 
 userSchema.methods.comparePin = comparePin;
+
+userSchema.index({ mobile: 1, email: 1 }, { unique: true });
 
 export const User = mongoose.model<UserDocument>("User", userSchema);
 export default User;
