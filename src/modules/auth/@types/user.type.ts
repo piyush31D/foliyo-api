@@ -1,4 +1,4 @@
-import { EUserProfile } from './user.enum';
+import { UserProfile } from './user.enum';
 
 export interface IUser {
   email: string;
@@ -8,7 +8,7 @@ export interface IUser {
   otpExpiry: Date;
   emailVerified: boolean;
   providor: string;
-  profiles: EUserProfile[];
+  profiles: UserProfile[];
   roles: string[];
   permissions: string[];
   lastSignIn?: Date;

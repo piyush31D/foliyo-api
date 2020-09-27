@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt";
 import mongoose from "mongoose";
 import { IUser } from '../@types/user.type';
-import { EUserProfile } from '../@types/user.enum';
+import { UserProfile } from '../@types/user.enum';
 
 export type UserDocument = mongoose.Document & IUser & {
   comparePin: comparePinFunction;
@@ -38,7 +38,7 @@ const userSchema = new mongoose.Schema({
   },
   profiles: {
     type: [String],
-    enum: [EUserProfile.ADVISOR, EUserProfile.INVESTOR]
+    enum: [UserProfile.ADVISOR, UserProfile.INVESTOR]
   },
   roles: {
     type: [String],

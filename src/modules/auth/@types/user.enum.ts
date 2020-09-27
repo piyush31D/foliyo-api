@@ -1,4 +1,4 @@
-export enum EUserProfile {
+export enum UserProfile {
   INVESTOR = 'INVESTOR',
   ADVISOR = 'ADVISOR'
 }
