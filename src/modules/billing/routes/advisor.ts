@@ -11,7 +11,7 @@ export = (app: Express) => {
     .get(getSubscriptionPlans)
     .post(createSubscriptionPlan);
 
-  app.route('/api/advisor/:advisorId/subscriptionplan/:subscriptionplanId')
+  app.route('/api/advisor/:advisorId/subscriptionplan/:subscriptionPlanId')
     .get(getSubscriptionPlan)
     .delete(deleteSubscriptionPlan);
 }
