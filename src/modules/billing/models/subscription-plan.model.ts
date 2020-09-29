@@ -1,4 +1,4 @@
-import mongoose, { mongo } from "mongoose";
+import mongoose from "mongoose";
 import { ISubscriptionPlan } from '../@types/susbscription-plan.type';
 
 export type SubscriptionPlanDocument = mongoose.Document & ISubscriptionPlan;
@@ -57,7 +57,15 @@ const subscriptionPlanSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  supportedProducts: []
+  supportedProducts: [],
+  subscribers: [{
+    type: mongoose.Types.ObjectId,
+    ref: 'Investor'
+  }],
+  prviousSubscribers: [{
+    type: mongoose.Types.ObjectId,
+    ref: 'Investor'
+  }]
 }, { timestamps: true });
 
 

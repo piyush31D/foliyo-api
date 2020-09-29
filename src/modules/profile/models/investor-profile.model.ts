@@ -66,7 +66,15 @@ const investorSchema = new mongoose.Schema({
       default: 0
     }
   }],
-  riskAnalysis: []
+  riskAnalysis: [],
+  subscriptions: [{
+    type: mongoose.Types.ObjectId,
+    ref: 'SubscriptionPlan'
+  }],
+  previousSubscriptions: [{
+    type: mongoose.Types.ObjectId,
+    ref: 'SubscriptionPlan'
+  }]
 }, { timestamps: true });
 
 

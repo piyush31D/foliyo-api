@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 export interface ISubscriptionPlan {
   advisor: string;
   user: string;
@@ -7,6 +8,8 @@ export interface ISubscriptionPlan {
   promotions: IPromotion[];
   minimumInvestment: number;
   supportedProducts: string[];
+  subscribers: mongoose.Types.ObjectId[];
+  prviousSubscribers: mongoose.Types.ObjectId[];
 };
 
 export interface IPlanPricing {
