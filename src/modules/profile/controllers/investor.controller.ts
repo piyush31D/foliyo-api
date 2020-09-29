@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import mongoose from 'mongoose';
 import httpStatus from 'http-status';
 import { Investor } from '../models/investor-profile.model';
+import { Advisor } from '../models/advisor-profile.model';
 import logger from '../../../winston';
 
 import { IInvestor } from '../@types/investor-type';
@@ -13,6 +14,8 @@ import {
 import APIError from '../../../error';
 import { UserProfile } from '../../auth/@types/user.enum';
 import User from '../../auth/models/user.model';
+import { investorIdParamSchema } from '../../../validators/investor';
+import { advisorIdParamSchema } from '../../../validators/advisor';
 
 export const getInvestorProfile = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -49,3 +52,27 @@ export const createInvestorProfile = async (req: Request, res: Response, next: N
     return next(error);
   }
 }
+
+//TODO: Add filters
+export const getAdvisors = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const advisors = await Advisor.find({});
+    return res.json({ success: true, data: { advisors } });
+  } catch (error) {
+    logger.error(error.message);
+    return next(error);
+  }
+};
+
+export const getAdvisor = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    await investorIdParamSchema.validateAsync(req.params);
+    await advisorIdParamSchema.validateAsync(req.params);
+    const advisor = await Advisor.findById(mongoose.Types.ObjectId(req.params.advisorId));
+    return res.json({ success: true, data: { advisor } });
+  } catch (error) {
+    logger.error(error.message);
+    return next(error);
+  }
+};
+
