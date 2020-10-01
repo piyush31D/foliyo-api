@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { ACCENT_COLOR } from '../../../const/theme/color';
 import { ISubscriptionPlan } from '../@types/susbscription-plan.type';
 
 export type SubscriptionPlanDocument = mongoose.Document & ISubscriptionPlan;
@@ -65,7 +66,12 @@ const subscriptionPlanSchema = new mongoose.Schema({
   prviousSubscribers: [{
     type: mongoose.Types.ObjectId,
     ref: 'Investor'
-  }]
+  }],
+  features: [String],
+  backgroundColor: {
+    type: String,
+    default: ACCENT_COLOR
+  }
 }, { timestamps: true });
 
 

@@ -24,5 +24,7 @@ export const createSubscriptionPlanSchema = Joi.object({
     description: Joi.string().required(),
     expiry: Joi.date().required(),
     maxDiscount: Joi.number().required()
-  }))
+  })),
+  features: Joi.array().items(Joi.string()),
+  backgroundColor: Joi.string()
 }).unknown().required();

@@ -8,6 +8,8 @@ export interface ISubscriptionPlan {
   promotions: IPromotion[];
   minimumInvestment: number;
   supportedProducts: string[];
+  features: string[];
+  backgroundColor: string;
   subscribers: mongoose.Types.ObjectId[];
   prviousSubscribers: mongoose.Types.ObjectId[];
 };
