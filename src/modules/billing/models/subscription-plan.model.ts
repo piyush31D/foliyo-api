@@ -38,21 +38,8 @@ const subscriptionPlanSchema = new mongoose.Schema({
     }
   }],
   promotions: [{
-    code: {
-      type: String
-    },
-    discountType: {
-      type: String
-    },
-    autoApply: Boolean,
-    planIntervals: String,
-    amount: Number,
-    percentage: Number,
-    description: {
-      type: String
-    },
-    expiry: Date,
-    maxDiscount: Number
+    type: mongoose.Types.ObjectId,
+    ref: 'PlanPromotion'
   }],
   minimumInvestment: {
     type: String,

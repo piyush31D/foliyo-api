@@ -3,9 +3,9 @@ export interface ISubscriptionPlan {
   advisor: string;
   user: string;
   name: string;
+  promotions: mongoose.Types.ObjectId[];
   planType: string;
   pricings: IPlanPricing[];
-  promotions: IPromotion[];
   minimumInvestment: number;
   supportedProducts: string[];
   features: string[];
@@ -20,15 +20,17 @@ export interface IPlanPricing {
   planInterval: PlanInterval;
 }
 
-export interface IPromotion {
+export interface IPlanPromotion {
   code: string;
   discountType: string;
   autoApply: boolean;
+  subscriptionPlans: mongoose.Types.ObjectId[];
   planIntervals: PlanInterval[];
   amount: number;
   percentage: number;
   description: string;
-  expiry: Date;
+  startDate: Date;
+  expiryDate: Date;
   maxDiscount: number;
 }
 
