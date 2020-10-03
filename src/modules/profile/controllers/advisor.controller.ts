@@ -15,7 +15,7 @@ import User from '../../auth/models/user.model';
 
 export const getAdvisorProfile = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const advisor = await Advisor.findOne({ mobile: req.user._id });
+    const advisor = await Advisor.findOne({ user: req.user._id });
     const data: { profileExists: boolean, profile?: IAdvisor } = { profileExists: false };
     if (advisor) {
       data.profileExists = true;
@@ -31,7 +31,7 @@ export const getAdvisorProfile = async (req: Request, res: Response, next: NextF
 export const createAdvisorProfile = async (req: Request, res: Response, next: NextFunction) => {
   try {
     await createAdvisorSchema.validateAsync(req.body);
-    const advisor = await Advisor.findOne({ mobile: req.user._id });
+    const advisor = await Advisor.findOne({ user: req.user._id });
     if (advisor)
       throw new APIError(ADVISOR_PROFILE_EXISTS, httpStatus.CONFLICT);
     const newAdvisor = new Advisor(req.body);
@@ -42,7 +42,14 @@ export const createAdvisorProfile = async (req: Request, res: Response, next: Ne
     await User.findByIdAndUpdate(mongoose.Types.ObjectId(req.user._id), { $push: { profiles: UserProfile.ADVISOR } });
     await session.commitTransaction();
     session.endSession();
-    return res.json({ success: true, data: { profile: newAdvisor }, message: ADVISOR_CREATE_SUCCESS });
+    return res.json({
+      success: true,
+      data: {
+        profileExists: true,
+        profile: newAdvisor
+      },
+      message: ADVISOR_CREATE_SUCCESS
+    });
   } catch (error) {
     logger.error(error.message);
     return next(error);
