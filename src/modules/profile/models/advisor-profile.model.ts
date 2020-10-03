@@ -24,7 +24,6 @@ const advisorSchema = new mongoose.Schema({
   },
   picture: {
     type: String,
-    required: true
   },
   mobile: {
     type: String,
@@ -36,7 +35,8 @@ const advisorSchema = new mongoose.Schema({
   },
   residence: {
     type: String,
-    required: true
+    required: true,
+    default:'INDIA'
   },
   category: {
     type: String,
