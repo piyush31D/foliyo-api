@@ -19,7 +19,7 @@ import { advisorIdParamSchema } from '../../../validators/advisor';
 
 export const getInvestorProfile = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const investor = await Investor.findOne({ mobile: req.user._id });
+    const investor = await Investor.findOne({ user: req.user._id });
     const data: { profileExists: boolean, profile?: IInvestor } = { profileExists: false };
     if (investor) {
       data.profileExists = true;
@@ -35,7 +35,7 @@ export const getInvestorProfile = async (req: Request, res: Response, next: Next
 export const createInvestorProfile = async (req: Request, res: Response, next: NextFunction) => {
   try {
     await createInvestorSchema.validateAsync(req.body);
-    const investor = await Investor.findOne({ mobile: req.user._id });
+    const investor = await Investor.findOne({ user: req.user._id });
     if (investor)
       throw new APIError(INVESTOR_PROFILE_EXISTS, httpStatus.CONFLICT);
     const newInvestor = new Investor(req.body);
