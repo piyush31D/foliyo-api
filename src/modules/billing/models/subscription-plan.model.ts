@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import { ACCENT_COLOR } from '../../../const/theme/color';
-import { ISubscriptionPlan } from '../@types/susbscription-plan.type';
+import { ISubscriptionPlan, PlanInterval } from '../@types/susbscription-plan.type';
 
 export type SubscriptionPlanDocument = mongoose.Document & ISubscriptionPlan;
 
@@ -27,6 +27,7 @@ const subscriptionPlanSchema = new mongoose.Schema({
     planInterval: {
       type: String,
       required: true,
+      enum: Object.values(PlanInterval)
     },
     amount: {
       type: Number,
@@ -42,18 +43,10 @@ const subscriptionPlanSchema = new mongoose.Schema({
     ref: 'PlanPromotion'
   }],
   minimumInvestment: {
-    type: String,
+    type: Number,
     required: true,
   },
   supportedProducts: [],
-  subscribers: [{
-    type: mongoose.Types.ObjectId,
-    ref: 'Investor'
-  }],
-  prviousSubscribers: [{
-    type: mongoose.Types.ObjectId,
-    ref: 'Investor'
-  }],
   features: [String],
   backgroundColor: {
     type: String,

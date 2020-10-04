@@ -3,7 +3,8 @@ import {
   createSubscriptionPlan,
   deleteSubscriptionPlan,
   getSubscriptionPlan,
-  getSubscriptionPlans
+  getSubscriptionPlans,
+  updateSubscriptionPlan
 } from "../controllers/advisor-subscription-plan.controller";
 
 export = (app: Express) => {
@@ -13,5 +14,6 @@ export = (app: Express) => {
 
   app.route('/api/advisor/:advisorId/subscriptionplan/:subscriptionPlanId')
     .get(getSubscriptionPlan)
+    .put(updateSubscriptionPlan)
     .delete(deleteSubscriptionPlan);
 }

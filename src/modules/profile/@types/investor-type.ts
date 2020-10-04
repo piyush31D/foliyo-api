@@ -1,4 +1,3 @@
-import mongoose from 'mongoose';
 export interface IInvestor {
   user: string;
   firstName: string;
@@ -13,9 +12,7 @@ export interface IInvestor {
   mothersName: string;
   pan: string;
   nomineeDetails: INominee[];
-  riskAnalysis: string[],
-  subscriptions: mongoose.Types.ObjectId[],
-  previousSubscriptions: mongoose.Types.ObjectId[]
+  riskAnalysis: string[]
 };
 
 //TODO: add more details to improve risk analysis

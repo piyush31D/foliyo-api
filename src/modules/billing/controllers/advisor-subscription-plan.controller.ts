@@ -4,7 +4,8 @@ import logger from '../../../winston';
 import { createSubscriptionPlanSchema } from '../validators/advisor';
 import {
   SUBSCRIPTION_PLAN_CREATE_SUCCESS,
-  SUBSCRIPTION_PLAN_DELETE_SUCCESS
+  SUBSCRIPTION_PLAN_DELETE_SUCCESS,
+  SUBSCRIPTION_PLAN_UPDATE_SUCCESS
 } from '../../../const/billing/billing-message.const';
 import { advisorIdParamSchema } from '../../../validators/advisor';
 import { subscriptionPlanIdParamSchema } from '../validators/common';
@@ -24,17 +25,31 @@ export const createSubscriptionPlan = async (req: Request, res: Response, next: 
   try {
     await advisorIdParamSchema.validateAsync(req.params);
     await createSubscriptionPlanSchema.validateAsync(req.body);
+    const subscriptionPlan = new SubscriptionPlan({
+      user: req.user._id,
+      advisor: req.params.advisorId,
+      ...req.body
+    });
+    await subscriptionPlan.save();
+    return res.json({ success: true, message: SUBSCRIPTION_PLAN_CREATE_SUCCESS, data: { subscriptionPlan } })
+  } catch (error) {
+    logger.error(error.message);
+    return next(error);
+  }
+}
+
+export const updateSubscriptionPlan = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    await advisorIdParamSchema.validateAsync(req.params);
+    await createSubscriptionPlanSchema.validateAsync(req.body);
+    await subscriptionPlanIdParamSchema.validateAsync(req.params);
     const subscriptionPlan = await SubscriptionPlan.findOneAndUpdate(
       {
+        _id: req.params.subscriptionPlanId,
         user: req.user._id,
         advisor: req.params.advisorId,
-      },
-      {
-        ...req.body,
-        advisor: req.params.advisorId,
-        user: req.user._id
-      }, { upsert: true });
-    return res.json({ success: true, message: SUBSCRIPTION_PLAN_CREATE_SUCCESS, data: { subscriptionPlan } })
+      }, req.body, { upsert: true, new: true });
+    return res.json({ success: true, message: SUBSCRIPTION_PLAN_UPDATE_SUCCESS, data: { subscriptionPlan } })
   } catch (error) {
     logger.error(error.message);
     return next(error);

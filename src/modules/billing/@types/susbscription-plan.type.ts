@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 export interface ISubscriptionPlan {
-  advisor: string;
-  user: string;
+  advisor: mongoose.Types.ObjectId;
+  user: mongoose.Types.ObjectId;
   name: string;
   promotions: mongoose.Types.ObjectId[];
   planType: string;
@@ -10,8 +10,6 @@ export interface ISubscriptionPlan {
   supportedProducts: string[];
   features: string[];
   backgroundColor: string;
-  subscribers: mongoose.Types.ObjectId[];
-  prviousSubscribers: mongoose.Types.ObjectId[];
 };
 
 export interface IPlanPricing {
@@ -40,4 +38,32 @@ export enum PlanInterval {
   MONTHLY = "MONTHLY",
   QUARTERLY = "QUARTERLY",
   YEARLY = "YEARLY",
+}
+
+export enum SubscriptionType {
+  ONETIME = "ONETIME",
+  RECURRING = "RECURRING"
+}
+
+export enum SubscriptionStatus {
+  ACTIVE = "ACTIVE",
+  CANCELLED = "CANCELLED"
+}
+
+export interface IInvestorSubscription {
+  investor: mongoose.Types.ObjectId;
+  advisor: mongoose.Types.ObjectId;
+  subscriptionPlan: mongoose.Types.ObjectId;
+  subscriptionType: SubscriptionType;
+  subscriptionStatus: SubscriptionStatus;
+  pricing: IPlanPricing;
+  subscriptionDate: Date;
+  nextPaymentDate: Date;
+  lastPaymentDetails: ISubscriptionPayment;
+  paymentDetails: ISubscriptionPayment[];
+  promotion?: mongoose.Types.ObjectId;
+}
+
+export interface ISubscriptionPayment {
+  amount: number
 }

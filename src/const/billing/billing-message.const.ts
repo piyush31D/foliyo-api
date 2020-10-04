@@ -5,6 +5,8 @@ export const SUBSCRIPTION_PLAN_DELETE_SUCCESS = 'Subscription plan deleted succe
 
 export const SUBSCRIPTION_PLAN_NOT_FOUND = 'Subscription plan not found';
 
+export const SUBSCRIPTION_PLAN_PRICING_NOT_FOUND = 'Subscription plan pricing not found';
+
 export const INVESTOR_SUBSCRIPTION_SUCCESS = 'Subscription successful';
 export const INVESTOR_SUBSCRIPTION_EXISTS = 'Subscription exists';
 export const INVESTOR_SUBSCRIPTION_NOT_FOUND = 'Subscription not found';
