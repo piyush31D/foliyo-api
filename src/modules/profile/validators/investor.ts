@@ -7,4 +7,4 @@ export const createInvestorSchema = Joi.object({
   mobile: Joi.string().custom(customMobileValidator).required(),
   email: Joi.string().email().required(),
   pan: Joi.string().required() //TODO: PAN validation
-}).unknown().required();
+}).required();

@@ -13,7 +13,7 @@ export const createSubscriptionPlanSchema = Joi.object({
   })),
   features: Joi.array().items(Joi.string()),
   backgroundColor: Joi.string()
-}).unknown().required();
+}).required();
 
 export const createPlanPromotionSchema = Joi.object({
   name: Joi.string(),
@@ -31,4 +31,4 @@ export const createPlanPromotionSchema = Joi.object({
   expiry: Joi.date().required(),
   maxDiscount: Joi.number().required(),
   subscriptionPlans: Joi.array().items(Joi.custom(customMongoObjectIdValidator)).required().min(1)
-}).unknown().required();
+}).required();
