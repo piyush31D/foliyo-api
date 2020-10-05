@@ -4,12 +4,14 @@ import httpStatus from 'http-status';
  * @extends Error
  */
 export class ExtendableError extends Error {
-  status: any;
-  constructor(message: string, status: any) {
+  status: number;
+  code: number;
+  constructor(message: string, status: number, code?: number) {
     super(message);
     this.name = this.constructor.name;
     this.message = message;
     this.status = status;
+    this.code = code;
   }
 }
 
@@ -23,8 +25,8 @@ export class APIError extends ExtendableError {
    * @param {string} message - Error message.
    * @param {number} status - HTTP status code of error.
    */
-  constructor(message: any, status: number = httpStatus.INTERNAL_SERVER_ERROR) {
-    super(message, status);
+  constructor(message: string, status: number = httpStatus.INTERNAL_SERVER_ERROR, code?: number) {
+    super(message, status, code);
   }
 }
 
@@ -39,8 +41,8 @@ export class MongoError extends ExtendableError {
    * @param {string} message - Error message.
    * @param {number} status - HTTP status code of error.
    */
-  constructor(message: any, status: number = httpStatus.INTERNAL_SERVER_ERROR) {
-    super(message, status);
+  constructor(message: any, status: number = httpStatus.INTERNAL_SERVER_ERROR, code?: number) {
+    super(message, status, code);
   }
 }
 
