@@ -77,7 +77,7 @@ export const setupPIN = async ({ body }: { body: { mobile: string, pin: string, 
     try {
       validatePinToken(pinToken);
     } catch {
-      throw new APIError(OTP_VERIFICATION_REQUIRED, httpStatus.FORBIDDEN);
+      throw new APIError(OTP_VERIFICATION_REQUIRED, httpStatus.UNAUTHORIZED);
     }
     const user = await User.findOne({ mobile });
     if (!user)
@@ -106,7 +106,7 @@ export const verifyPIN = async ({ body }: { body: { mobile: string, pin: string,
     try {
       validatePinToken(pinToken);
     } catch {
-      throw new APIError(OTP_VERIFICATION_REQUIRED, httpStatus.FORBIDDEN);
+      throw new APIError(OTP_VERIFICATION_REQUIRED, httpStatus.UNAUTHORIZED);
     }
     const user = await User.findOne({ mobile });
     if (!user)
