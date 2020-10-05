@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 export interface IInvestor {
   user: string;
   firstName: string;
@@ -27,14 +28,10 @@ export interface INominee {
   percentage: number;
 }
 
-export interface IGroupCriteria {
-  name: string;
-  values: string[];
-}
-
 export interface IInvestorGroup {
+  advisor: mongoose.Types.ObjectId,
+  user: mongoose.Types.ObjectId,
   name: string;
-  investors: IInvestor[];
-  groupCriterias: IGroupCriteria[];
-  autoAddition: boolean;
+  investors: mongoose.Types.ObjectId[];
+  automatic: boolean;
 }

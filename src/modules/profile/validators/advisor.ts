@@ -9,5 +9,18 @@ export const createAdvisorSchema = Joi.object({
   individualDetails: Joi.object({
     firstName: Joi.string().required(),
     lastName: Joi.string().required(),
-  }).unknown().required()
-}).unknown().required();
+  }).required()
+}).required();
+
+
+export const createInvestorGroupSchema = Joi.object({
+  name: Joi.string().required(),
+  investors: Joi.array().items(customMobileValidator).required(),
+  automatic: Joi.boolean() //TODO: Add validation for criteria if true
+}).required();
+
+export const updateInvestorGroupSchema = Joi.object({
+  name: Joi.string().required(),
+  investors: Joi.array().items(customMobileValidator).required(),
+  automatic: Joi.boolean()
+}).required();

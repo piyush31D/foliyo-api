@@ -4,14 +4,27 @@ import httpStatus from 'http-status';
 import { Advisor } from '../models/advisor-profile.model';
 import logger from '../../../winston';
 import { IAdvisor } from '../@types/advisor-type';
-import { createAdvisorSchema } from '../validators/advisor';
+import { createAdvisorSchema, createInvestorGroupSchema, updateInvestorGroupSchema } from '../validators/advisor';
 import {
   ADVISOR_CREATE_SUCCESS,
-  ADVISOR_PROFILE_EXISTS
+  ADVISOR_INVESTOR_ACCESS_ERROR,
+  ADVISOR_PROFILE_EXISTS,
+  GROUP_ADD_INVESTOR_SUCCESS,
+  GROUP_CREATE_SUCCESS,
+  GROUP_DELETE_SUCCESS,
+  GROUP_NOT_FOUND,
+  GROUP_REMOVE_INVESTOR_SUCCESS,
+  GROUP_UPDATE_SUCCESS
 } from '../../../const/profile/profile-message.const';
 import APIError from '../../../error';
 import { UserProfile } from '../../auth/@types/user.enum';
 import User from '../../auth/models/user.model';
+import { InvestorSubscription } from '../../../modules/billing/models/investor-subscription.model';
+import { advisorIdParamSchema } from '../../../validators/advisor';
+import { investorgroupIdParamSchema } from '../validators/common';
+import { InvestorGroup } from '../models/investor-group.model';
+import { investorIdParamSchema } from '../../../validators/investor';
+import { Investor } from '../models/investor-profile.model';
 
 export const getAdvisorProfile = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -50,6 +63,193 @@ export const createAdvisorProfile = async (req: Request, res: Response, next: Ne
       },
       message: ADVISOR_CREATE_SUCCESS
     });
+  } catch (error) {
+    logger.error(error.message);
+    return next(error);
+  }
+}
+
+export const getInvestorsOverview = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    await advisorIdParamSchema.validateAsync(req.params);
+    const investors = await InvestorSubscription.count({});
+    return res.json({ success: true, data: { investors } });
+  } catch (error) {
+    logger.error(error.message);
+    return next(error);
+  }
+}
+
+export const getInvestors = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    await advisorIdParamSchema.validateAsync(req.params);
+    const investors = await InvestorSubscription.find({ advisor: req.params.advisorId });
+    return res.json({ success: true, data: { investors } });
+  } catch (error) {
+    logger.error(error.message);
+    return next(error);
+  }
+}
+
+export const getInvestor = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    await advisorIdParamSchema.validateAsync(req.params);
+    await investorIdParamSchema.validateAsync(req.params);
+    const advisorId = mongoose.Types.ObjectId(req.params.advisorId);
+    const investorId = mongoose.Types.ObjectId(req.params.investorId);
+    const subscriptions = await InvestorSubscription.find({
+      advisor: advisorId,
+      investor: investorId
+    });
+    if (!subscriptions.length) {
+      throw new APIError(ADVISOR_INVESTOR_ACCESS_ERROR, httpStatus.FORBIDDEN)
+    }
+    const investor = await Investor.findOne({
+      _id: investorId
+    });
+    return res.json({ success: true, data: { investor } });
+  } catch (error) {
+    logger.error(error.message);
+    return next(error);
+  }
+}
+
+export const getInvestorGroups = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    await advisorIdParamSchema.validateAsync(req.params);
+    const advisorId = mongoose.Types.ObjectId(req.params.advisorId);
+    const groups = await InvestorGroup.find({
+      advisor: advisorId,
+      user: req.user._id
+    })
+    return res.json({ success: true, data: { groups } });
+  } catch (error) {
+    logger.error(error.message);
+    return next(error);
+  }
+}
+
+export const createInvestorGroup = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    await advisorIdParamSchema.validateAsync(req.params);
+    await createInvestorGroupSchema.validateAsync(req.body);
+    const { advisorId } = req.params;
+    const group = new InvestorGroup({
+      ...req.body,
+      advisor: advisorId,
+      user: req.user._id
+    });
+    await group.save();
+    return res.json({ success: true, message: GROUP_CREATE_SUCCESS, data: { group } });
+  } catch (error) {
+    logger.error(error.message);
+    return next(error);
+  }
+}
+
+export const getInvestorGroup = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    await advisorIdParamSchema.validateAsync(req.params);
+    await investorgroupIdParamSchema.validateAsync(req.params);
+    const advisorId = mongoose.Types.ObjectId(req.params.advisorId);
+    const investorgroupId = mongoose.Types.ObjectId(req.params.investorgroupId);
+    const group = await InvestorGroup.findOne({
+      advisor: advisorId,
+      _id: investorgroupId
+    });
+    return res.json({ success: true, data: { group } });
+  } catch (error) {
+    logger.error(error.message);
+    return next(error);
+  }
+}
+
+export const updateInvestorGroup = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    await advisorIdParamSchema.validateAsync(req.params);
+    await investorgroupIdParamSchema.validateAsync(req.params);
+    await updateInvestorGroupSchema.validateAsync(req.body);
+    const advisorId = mongoose.Types.ObjectId(req.params.advisorId);
+    const investorgroupId = mongoose.Types.ObjectId(req.params.investorgroupId);
+    const group = await InvestorGroup.findOneAndUpdate({
+      _id: investorgroupId,
+      advisor: advisorId
+    }, req.body, { new: true });
+    return res.json({ success: true, message: GROUP_UPDATE_SUCCESS, data: { group } });
+  } catch (error) {
+    logger.error(error.message);
+    return next(error);
+  }
+}
+
+
+export const deleteInvestorGroup = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    await advisorIdParamSchema.validateAsync(req.params);
+    await investorgroupIdParamSchema.validateAsync(req.params);
+    const advisorId = mongoose.Types.ObjectId(req.params.advisorId);
+    const investorgroupId = mongoose.Types.ObjectId(req.params.investorgroupId);
+    const group = await InvestorGroup.findOne({
+      advisor: advisorId,
+      _id: investorgroupId
+    });
+    if (!group) {
+      throw new APIError(GROUP_NOT_FOUND, httpStatus.NOT_FOUND);
+    }
+    await InvestorGroup.findOneAndRemove({
+      _id: investorgroupId,
+      advisor: advisorId
+    });
+    return res.json({ success: true, message: GROUP_DELETE_SUCCESS });
+  } catch (error) {
+    logger.error(error.message);
+    return next(error);
+  }
+}
+
+export const addInvestorToGroup = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    await advisorIdParamSchema.validateAsync(req.params);
+    await investorgroupIdParamSchema.validateAsync(req.params);
+    await investorIdParamSchema.validateAsync(req.params);
+    await updateInvestorGroupSchema.validateAsync(req.body);
+    const advisorId = mongoose.Types.ObjectId(req.params.advisorId);
+    const investorgroupId = mongoose.Types.ObjectId(req.params.investorgroupId);
+    const investorId = mongoose.Types.ObjectId(req.params.investorId);
+    await InvestorGroup.findOneAndUpdate({
+      _id: investorgroupId,
+      advisor: advisorId
+    }, {
+      $push: {
+        investors: investorId
+      }
+    }, { new: true });
+    return res.json({ success: true, message: GROUP_ADD_INVESTOR_SUCCESS });
+  } catch (error) {
+    logger.error(error.message);
+    return next(error);
+  }
+}
+
+
+export const removeInvestorFromGroup = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    await advisorIdParamSchema.validateAsync(req.params);
+    await investorgroupIdParamSchema.validateAsync(req.params);
+    await investorIdParamSchema.validateAsync(req.params);
+    await updateInvestorGroupSchema.validateAsync(req.body);
+    const advisorId = mongoose.Types.ObjectId(req.params.advisorId);
+    const investorgroupId = mongoose.Types.ObjectId(req.params.investorgroupId);
+    const investorId = mongoose.Types.ObjectId(req.params.investorId);
+    await InvestorGroup.findOneAndUpdate({
+      _id: investorgroupId,
+      advisor: advisorId
+    }, {
+      $pull: {
+        investors: investorId
+      }
+    }, { new: true });
+    return res.json({ success: true, message: GROUP_REMOVE_INVESTOR_SUCCESS });
   } catch (error) {
     logger.error(error.message);
     return next(error);
