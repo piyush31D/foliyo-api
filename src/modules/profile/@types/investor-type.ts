@@ -13,7 +13,8 @@ export interface IInvestor {
   mothersName: string;
   pan: string;
   nomineeDetails: INominee[];
-  riskAnalysis: string[]
+  riskAnalysis: string[];
+  groups: mongoose.Types.ObjectId[]
 };
 
 //TODO: add more details to improve risk analysis

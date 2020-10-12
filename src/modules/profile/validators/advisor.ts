@@ -21,6 +21,9 @@ export const createInvestorGroupSchema = Joi.object({
 
 export const updateInvestorGroupSchema = Joi.object({
   name: Joi.string().required(),
-  investors: Joi.array().items(customMobileValidator).required(),
   automatic: Joi.boolean()
+}).required();
+
+export const addRemoveInvestorsToGroupSchema = Joi.object({
+  investors: Joi.array().items(customMobileValidator).required()
 }).required();

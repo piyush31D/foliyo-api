@@ -66,6 +66,10 @@ const investorSchema = new mongoose.Schema({
       default: 0
     }
   }],
+  groups: [{
+    type: mongoose.Types.ObjectId,
+    ref: 'InvestorGroup'
+  }],
   riskAnalysis: []
 }, { timestamps: true });
 

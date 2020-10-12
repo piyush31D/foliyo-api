@@ -4,7 +4,7 @@ import httpStatus from 'http-status';
 import { Advisor } from '../models/advisor-profile.model';
 import logger from '../../../winston';
 import { IAdvisor } from '../@types/advisor-type';
-import { createAdvisorSchema, createInvestorGroupSchema, updateInvestorGroupSchema } from '../validators/advisor';
+import { addRemoveInvestorsToGroupSchema, createAdvisorSchema, createInvestorGroupSchema, updateInvestorGroupSchema } from '../validators/advisor';
 import {
   ADVISOR_CREATE_SUCCESS,
   ADVISOR_INVESTOR_ACCESS_ERROR,
@@ -41,7 +41,9 @@ export const getAdvisorProfile = async (req: Request, res: Response, next: NextF
   }
 };
 
-export const createAdvisorProfile = async (req: Request, res: Response, next: NextFunction) => {
+
+
+export const createAdvisorProfile = async (req: Request<{}, {}, { investors: string[] }>, res: Response, next: NextFunction) => {
   try {
     await createAdvisorSchema.validateAsync(req.body);
     const advisor = await Advisor.findOne({ user: req.user._id });
@@ -129,17 +131,36 @@ export const getInvestorGroups = async (req: Request, res: Response, next: NextF
   }
 }
 
-export const createInvestorGroup = async (req: Request, res: Response, next: NextFunction) => {
+interface CreateInvestorGroup {
+  name: string;
+  investors: string[];
+  automatic: boolean;
+}
+
+export const createInvestorGroup = async (req: Request<{ advisorId: string }, {}, CreateInvestorGroup>, res: Response, next: NextFunction) => {
   try {
+    const { investors, ...rest } = req.body;
     await advisorIdParamSchema.validateAsync(req.params);
     await createInvestorGroupSchema.validateAsync(req.body);
     const { advisorId } = req.params;
     const group = new InvestorGroup({
-      ...req.body,
+      ...rest,
       advisor: advisorId,
       user: req.user._id
     });
-    await group.save();
+    if (investors && investors.length) {
+      const investorIds = investors.map(investor => mongoose.Types.ObjectId(investor));
+      group.investors = investorIds;
+      const session = await mongoose.startSession();
+      session.startTransaction();
+      await group.save();
+      await Investor.updateMany({ _id: { $in: investorIds } },
+        { $push: { groups: group._id } });
+      await session.commitTransaction();
+      session.endSession();
+    } else {
+      await group.save();
+    }
     return res.json({ success: true, message: GROUP_CREATE_SUCCESS, data: { group } });
   } catch (error) {
     logger.error(error.message);
@@ -174,7 +195,7 @@ export const updateInvestorGroup = async (req: Request, res: Response, next: Nex
     const group = await InvestorGroup.findOneAndUpdate({
       _id: investorgroupId,
       advisor: advisorId
-    }, req.body, { new: true });
+    }, { $set: req.body }, { new: true });
     return res.json({ success: true, message: GROUP_UPDATE_SUCCESS, data: { group } });
   } catch (error) {
     logger.error(error.message);
@@ -207,23 +228,34 @@ export const deleteInvestorGroup = async (req: Request, res: Response, next: Nex
   }
 }
 
-export const addInvestorToGroup = async (req: Request, res: Response, next: NextFunction) => {
+type Params = {
+  advisorId: string;
+  investorgroupId: string;
+}
+//TODO: Allocate folio if group is part of any folio
+export const addInvestorsToGroup = async (req: Request<Params, {}, { investors: string[] }>, res: Response, next: NextFunction) => {
   try {
     await advisorIdParamSchema.validateAsync(req.params);
     await investorgroupIdParamSchema.validateAsync(req.params);
-    await investorIdParamSchema.validateAsync(req.params);
-    await updateInvestorGroupSchema.validateAsync(req.body);
+    await addRemoveInvestorsToGroupSchema.validateAsync(req.body);
+    const investors = req.body.investors.map((investor) => mongoose.Types.ObjectId(investor));
     const advisorId = mongoose.Types.ObjectId(req.params.advisorId);
     const investorgroupId = mongoose.Types.ObjectId(req.params.investorgroupId);
-    const investorId = mongoose.Types.ObjectId(req.params.investorId);
+    const session = await mongoose.startSession();
+    session.startTransaction();
     await InvestorGroup.findOneAndUpdate({
       _id: investorgroupId,
       advisor: advisorId
     }, {
       $push: {
-        investors: investorId
+        investors: {
+          $each: investors
+        }
       }
-    }, { new: true });
+    });
+    await Investor.updateMany({ _id: { $in: investors } }, { $push: { groups: investorgroupId } });
+    await session.commitTransaction();
+    session.endSession();
     return res.json({ success: true, message: GROUP_ADD_INVESTOR_SUCCESS });
   } catch (error) {
     logger.error(error.message);
@@ -231,24 +263,25 @@ export const addInvestorToGroup = async (req: Request, res: Response, next: Next
   }
 }
 
-
-export const removeInvestorFromGroup = async (req: Request, res: Response, next: NextFunction) => {
+//TODO: Deallocate folio if group is part of any folio
+export const removeInvestorsFromGroup = async (req: Request<Params, {}, { investors: string[] }>, res: Response, next: NextFunction) => {
   try {
     await advisorIdParamSchema.validateAsync(req.params);
     await investorgroupIdParamSchema.validateAsync(req.params);
-    await investorIdParamSchema.validateAsync(req.params);
-    await updateInvestorGroupSchema.validateAsync(req.body);
+    await addRemoveInvestorsToGroupSchema.validateAsync(req.body);
     const advisorId = mongoose.Types.ObjectId(req.params.advisorId);
     const investorgroupId = mongoose.Types.ObjectId(req.params.investorgroupId);
-    const investorId = mongoose.Types.ObjectId(req.params.investorId);
-    await InvestorGroup.findOneAndUpdate({
+    const investors = req.body.investors.map((investor) => mongoose.Types.ObjectId(investor)); const session = await mongoose.startSession();
+    session.startTransaction();
+    await InvestorGroup.update({
       _id: investorgroupId,
       advisor: advisorId
     }, {
-      $pull: {
-        investors: investorId
-      }
-    }, { new: true });
+      $pullAll: { investors }
+    });
+    await Investor.updateMany({ _id: { $in: investors } }, { $pull: { groups: investorgroupId } });
+    await session.commitTransaction();
+    session.endSession();
     return res.json({ success: true, message: GROUP_REMOVE_INVESTOR_SUCCESS });
   } catch (error) {
     logger.error(error.message);

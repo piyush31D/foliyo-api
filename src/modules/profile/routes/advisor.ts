@@ -9,8 +9,8 @@ import {
   getInvestors,
   getInvestorsOverview,
   updateInvestorGroup,
-  addInvestorToGroup,
-  removeInvestorFromGroup
+  addInvestorsToGroup,
+  removeInvestorsFromGroup
 } from "../controllers/advisor.controller";
 
 export = (app: Express) => {
@@ -36,7 +36,7 @@ export = (app: Express) => {
     .put(updateInvestorGroup)
     .delete(deleteInvestorGroup);
 
-  app.route('/api/advisor/:advisorId/investorgroup/:investorgroupId/investor/:investorId')
-    .post(addInvestorToGroup)
-    .delete(removeInvestorFromGroup);
+  app.route('/api/advisor/:advisorId/investorgroup/:investorgroupId/investor')
+    .post(addInvestorsToGroup)
+    .delete(removeInvestorsFromGroup);
 }
