@@ -1,7 +1,12 @@
+import mongoose from 'mongoose';
+import { IInvestorTrade } from 'src/modules/trade/@types/trade-type';
+
 export interface IMasterFolio {
+  advisor: mongoose.Types.ObjectId,
+  user: mongoose.Types.ObjectId,
   name: string;
-  investors: string[];
-  investorsGroups: string[];
+  investors: mongoose.Types.ObjectId[];
+  investorGroups: mongoose.Types.ObjectId[];
   constituents: IConstituent[];
   masterTrades: string[];
 };
@@ -22,8 +27,8 @@ export interface IConstituent {
 export interface IInvestorFolio {
   name: string;
   masterFolio: string;
-  investor: string[];
-  user: string;
+  investor: mongoose.Types.ObjectId;
+  user: mongoose.Types.ObjectId;
   constituents: IConstituent[];
-  trades: string[];
+  trades: IInvestorTrade[];
 };

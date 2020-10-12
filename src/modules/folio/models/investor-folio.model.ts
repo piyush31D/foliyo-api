@@ -4,21 +4,20 @@ import { IInvestorFolio } from '../@types/folio-type';
 export type InvestorFolioDocument = mongoose.Document & IInvestorFolio;
 
 const investorFolioSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: true
-  },
-  masterFolio: {
-    type: mongoose.Types.ObjectId,
-    required: true
-  },
   investor: {
     type: mongoose.Types.ObjectId,
-    required: true
+    required: true,
+    ref: 'Investor'
   },
   user: {
     type: mongoose.Types.ObjectId,
-    required: true
+    required: true,
+    ref: 'User'
+  },
+  masterFolio: {
+    type: mongoose.Types.ObjectId,
+    required: true,
+    ref: 'MasterFolio'
   },
   constituents: [
     {
@@ -29,10 +28,6 @@ const investorFolioSchema = new mongoose.Schema({
       symbol: {
         type: String,
         required: true,
-      },
-      lastPrice: {
-        type: Number,
-        default: 0
       },
       expiry: Date,
       strike: {
