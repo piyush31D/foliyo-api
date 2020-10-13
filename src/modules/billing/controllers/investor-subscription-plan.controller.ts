@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import mongoose from 'mongoose';
+import mongoose, { FilterQuery } from 'mongoose';
 import { SubscriptionPlan } from '../models/subscription-plan.model';
 import logger from '../../../winston';
 import {
@@ -12,10 +12,10 @@ import {
 } from '../../../const/billing/billing-message.const';
 import { advisorIdParamSchema } from '../../../validators/advisor';
 import { investorIdParamSchema } from '../../../validators/investor';
-import { subscriptionPlanIdParamSchema } from '../validators/common';
-import { subscribeAdvisorSubscriptionPlanSchema } from '../validators/investor';
+import { subscriptionIdParamSchema, subscriptionPlanIdParamSchema } from '../validators/common';
+import { subscribeAdvisorSubscriptionPlanSchema, subscriptionQuerySchema } from '../validators/investor';
 import { IInvestorSubscription, SubscriptionStatus } from '../@types/susbscription-plan.type';
-import { InvestorSubscription } from '../models/investor-subscription.model';
+import { InvestorSubscription, InvestorSubscriptionDocument } from '../models/investor-subscription.model';
 
 export const getAdvisorSubscriptionPlans = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -29,7 +29,7 @@ export const getAdvisorSubscriptionPlans = async (req: Request, res: Response, n
   }
 };
 
-export const subscribeAdvisorSubscriptionPlans = async (req: Request, res: Response, next: NextFunction) => {
+export const subscribeAdvisorSubscriptionPlan = async (req: Request, res: Response, next: NextFunction) => {
   try {
     await investorIdParamSchema.validateAsync(req.params);
     await subscriptionPlanIdParamSchema.validateAsync(req.params);
@@ -54,6 +54,7 @@ export const subscribeAdvisorSubscriptionPlans = async (req: Request, res: Respo
     }
     await new InvestorSubscription({
       investor: investorId,
+      user: req.user._id,
       advisor: subscriptionPlan.advisor,
       subscriptionPlan: subscriptionPlanId,
       ...req.body
@@ -68,20 +69,19 @@ export const subscribeAdvisorSubscriptionPlans = async (req: Request, res: Respo
 export const cancelAdvisorSubscriptionPlan = async (req: Request, res: Response, next: NextFunction) => {
   try {
     await investorIdParamSchema.validateAsync(req.params);
-    await subscriptionPlanIdParamSchema.validateAsync(req.params);
+    await subscriptionIdParamSchema.validateAsync(req.params);
     const investorId = mongoose.Types.ObjectId(req.params.investorId);
-    const subscriptionPlanId = mongoose.Types.ObjectId(req.params.subscriptionPlanId);
+    const subscriptionId = mongoose.Types.ObjectId(req.params.subscriptionId);
     const subscriptionPlan = await InvestorSubscription.findOne({
       investor: investorId,
-      subscriptionPlan: subscriptionPlanId
+      _id: subscriptionId
     });
     if (!subscriptionPlan) {
       throw new Error(INVESTOR_SUBSCRIPTION_NOT_FOUND);
     }
-
     await InvestorSubscription.findOneAndUpdate({
       investor: investorId,
-      subscriptionPlan: subscriptionPlanId
+      _id: subscriptionId
     },
       {
         $set: {
@@ -89,6 +89,32 @@ export const cancelAdvisorSubscriptionPlan = async (req: Request, res: Response,
         }
       });
     return res.json({ success: true, message: INVESTOR_CANCEL_SUBSCRIPTION_SUCCESS });
+  } catch (error) {
+    logger.error(error.message);
+    return next(error);
+  }
+};
+
+type SubscriptionQuery = {
+  subscriptionStatus?: SubscriptionStatus
+}
+
+export const getAllSubscriptions = async (req: Request<{ investorId: string }, {}, {}, SubscriptionQuery>, res: Response, next: NextFunction) => {
+  try {
+    await investorIdParamSchema.validateAsync(req.params);
+    await subscriptionQuerySchema.validateAsync(req.query);
+    const { subscriptionStatus } = req.query;
+    const investorId = mongoose.Types.ObjectId(req.params.investorId);
+    const filterQuery: FilterQuery<InvestorSubscriptionDocument> = {
+      investor: investorId,
+      user: req.user._id,
+      subscriptionStatus: SubscriptionStatus.ACTIVE
+    };
+    if (subscriptionStatus) {
+      filterQuery.subscriptionStatus = subscriptionStatus;
+    }
+    const subscriptions = await InvestorSubscription.find();
+    return res.json({ success: true, data: { subscriptions } });
   } catch (error) {
     logger.error(error.message);
     return next(error);

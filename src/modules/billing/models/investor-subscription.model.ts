@@ -8,6 +8,10 @@ const investorSubscriptionSchema = new mongoose.Schema({
     type: mongoose.Types.ObjectId,
     ref: 'Investor'
   },
+  user: {
+    type: mongoose.Types.ObjectId,
+    ref: 'Investor'
+  },
   advisor: {
     type: mongoose.Types.ObjectId,
     ref: 'Advisor'

@@ -52,6 +52,7 @@ export enum SubscriptionStatus {
 
 export interface IInvestorSubscription {
   investor: mongoose.Types.ObjectId;
+  user: mongoose.Types.ObjectId;
   advisor: mongoose.Types.ObjectId;
   subscriptionPlan: mongoose.Types.ObjectId;
   subscriptionType: SubscriptionType;
