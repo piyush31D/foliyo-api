@@ -40,6 +40,7 @@ export const createInvestorProfile = async (req: Request, res: Response, next: N
       throw new APIError(INVESTOR_PROFILE_EXISTS, httpStatus.CONFLICT);
     const newInvestor = new Investor(req.body);
     newInvestor.user = req.user._id;
+    newInvestor.fullName = `${req.body.firstName} ${req.body.lastName}`;
     const session = await mongoose.startSession();
     session.startTransaction();
     await newInvestor.save();

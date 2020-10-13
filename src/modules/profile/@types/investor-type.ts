@@ -3,6 +3,7 @@ export interface IInvestor {
   user: string;
   firstName: string;
   lastName: string;
+  fullName: string;
   gender: string;
   picture: string;
   mobile: string;

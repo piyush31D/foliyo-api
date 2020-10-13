@@ -17,6 +17,9 @@ const investorSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  fullName: {
+    type: String
+  },
   gender: {
     type: String
   },
