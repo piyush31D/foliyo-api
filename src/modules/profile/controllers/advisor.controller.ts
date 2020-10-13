@@ -82,10 +82,34 @@ export const getInvestorsOverview = async (req: Request, res: Response, next: Ne
   }
 }
 
-export const getInvestors = async (req: Request, res: Response, next: NextFunction) => {
+type GetInvestorsQuery = {
+  name?: string
+}
+
+export const getInvestors = async (req: Request<{ advisorId: string }, {}, {}, GetInvestorsQuery>, res: Response, next: NextFunction) => {
   try {
     await advisorIdParamSchema.validateAsync(req.params);
-    const investors = await InvestorSubscription.find({ advisor: req.params.advisorId });
+    const advisorId = mongoose.Types.ObjectId(req.params.advisorId);
+    const { name } = req.query;
+    const query: any[] = [
+      { $match: { "advisor": advisorId } },
+      { $group: { _id: "$investor", data: { $first: "$$ROOT" } } },
+      { $replaceRoot: { newRoot: "$data" } },
+      {
+        $lookup: {
+          from: "investors",
+          localField: "investor",
+          foreignField: "_id",
+          as: "investor"
+        }
+      },
+      { $unwind: "$investor" }
+    ];
+    if (name) {
+      query.push({ $match: { "investor.fullName": { $regex: new RegExp(`^${name}`, 'i') } } })
+    }
+    query.push({ $replaceRoot: { newRoot: "$investor" } });
+    const investors = await InvestorSubscription.aggregate(query);
     return res.json({ success: true, data: { investors } });
   } catch (error) {
     logger.error(error.message);
