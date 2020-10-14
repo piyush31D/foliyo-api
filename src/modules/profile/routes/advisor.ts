@@ -7,6 +7,7 @@ import {
   getInvestorGroup,
   getInvestorGroups,
   getInvestors,
+  getInvestor,
   getInvestorsOverview,
   updateInvestorGroup,
   addInvestorsToGroup,
@@ -25,11 +26,11 @@ export = (app: Express) => {
     .get(getInvestors);
 
   app.route('/api/advisor/:advisorId/investor/:investorId')
-    .get(getInvestors);
+    .get(getInvestor);
 
   app.route('/api/advisor/:advisorId/investorgroup')
     .get(getInvestorGroups)
-    .get(createInvestorGroup);
+    .post(createInvestorGroup);
 
   app.route('/api/advisor/:advisorId/investorgroup/:investorgroupId')
     .get(getInvestorGroup)
