@@ -201,7 +201,7 @@ export const getInvestorGroup = async (req: Request, res: Response, next: NextFu
     const group = await InvestorGroup.findOne({
       advisor: advisorId,
       _id: investorgroupId
-    });
+    }).populate('investors');
     return res.json({ success: true, data: { group } });
   } catch (error) {
     logger.error(error.message);
