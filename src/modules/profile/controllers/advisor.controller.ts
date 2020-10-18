@@ -147,7 +147,7 @@ export const getInvestorGroups = async (req: Request, res: Response, next: NextF
     const groups = await InvestorGroup.find({
       advisor: advisorId,
       user: req.user._id
-    })
+    }).select('-investors')   //FIXME: Pass this from query params
     return res.json({ success: true, data: { groups } });
   } catch (error) {
     logger.error(error.message);
