@@ -1,5 +1,5 @@
 import Joi from '@hapi/joi';
-import { customMobileValidator } from '../../../utils/validator';
+import { customMobileValidator, customMongoObjectIdValidator } from '../../../utils/validator';
 
 //TODO: Handle individual and company details based on category
 export const createAdvisorSchema = Joi.object({
@@ -15,7 +15,7 @@ export const createAdvisorSchema = Joi.object({
 
 export const createInvestorGroupSchema = Joi.object({
   name: Joi.string().required(),
-  investors: Joi.array().items(customMobileValidator).required(),
+  investors: Joi.array().items(customMongoObjectIdValidator).required(),
   automatic: Joi.boolean() //TODO: Add validation for criteria if true
 }).required();
 
@@ -25,5 +25,5 @@ export const updateInvestorGroupSchema = Joi.object({
 }).required();
 
 export const addRemoveInvestorsToGroupSchema = Joi.object({
-  investors: Joi.array().items(customMobileValidator).required()
+  investors: Joi.array().items(customMongoObjectIdValidator).required()
 }).required();
