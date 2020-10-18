@@ -33,11 +33,11 @@ export interface IPlanPromotion {
 }
 
 export enum PlanInterval {
-  WEEKLY = "WEEK",
-  FORTNIGHTLY = "FORTNIGHT",
-  MONTHLY = "MONTH",
-  QUARTERLY = "QUARTER",
-  YEARLY = "YEAR",
+  WEEKLY = "WEEKLY",
+  FORTNIGHTLY = "FORTNIGHTLY",
+  MONTHLY = "MONTHLY",
+  QUARTERLY = "QUARTERLY",
+  YEARLY = "YEARLY",
 }
 
 export enum SubscriptionType {

@@ -1,5 +1,6 @@
 import Joi from '@hapi/joi';
 import { customMongoObjectIdValidator } from '../../../utils/validator';
+import { PlanInterval } from '../@types/susbscription-plan.type';
 
 export const createSubscriptionPlanSchema = Joi.object({
   name: Joi.string().required(),
@@ -9,7 +10,7 @@ export const createSubscriptionPlanSchema = Joi.object({
   pricings: Joi.array().items(Joi.object({
     amount: Joi.number().required(),
     percentage: Joi.number().required(),
-    planInterval: Joi.string().required(), //TODO: Add enum
+    planInterval: Joi.string().valid(...Object.values(PlanInterval)).required(),
   })),
   features: Joi.array().items(Joi.string()),
   backgroundColor: Joi.string()
@@ -24,7 +25,7 @@ export const createPlanPromotionSchema = Joi.object({
     otherwise: Joi.optional()
   }),
   discountType: Joi.string().required(),
-  planIntervals: Joi.array().min(1).items(Joi.string()),
+  planIntervals: Joi.array().min(1).items(Joi.string().valid(...Object.values(PlanInterval))),
   amount: Joi.number().required(),
   percentage: Joi.number().required(),
   description: Joi.string().required(),
