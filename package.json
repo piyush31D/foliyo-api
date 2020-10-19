@@ -16,6 +16,7 @@
   "dependencies": {
     "@hapi/joi": "^17.1.1",
     "async": "^3.2.0",
+    "axios": "^0.20.0",
     "bcrypt": "^5.0.0",
     "bluebird": "^3.7.2",
     "body-parser": "^1.19.0",
@@ -44,7 +45,8 @@
     "nanoid": "^3.1.12",
     "nodemailer": "^6.4.11",
     "validator": "^13.1.1",
-    "winston": "^3.3.3"
+    "winston": "^3.3.3",
+    "xlsx": "^0.16.8"
   },
   "devDependencies": {
     "@types/async": "^3.2.3",

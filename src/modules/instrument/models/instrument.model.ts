@@ -1,20 +1,22 @@
 import mongoose from "mongoose";
 import { IInstrument } from '../@types/instrument-type';
 
-
 export type InstrumentDocument = mongoose.Document & IInstrument
 
 const instrumentSchema = new mongoose.Schema({
-  exchangeToken: {
+  source: {
     type: String,
-    unique: true
+    default: 'KITE'
   },
+  exchangeToken: {
+    type: String
+  },
+  instrumentToken: String,
   name: {
     type: String
   },
   symbol: {
-    type: String,
-    unique: true,
+    type: String
   },
   lastPrice: Number,
   expiry: Date,
@@ -26,5 +28,6 @@ const instrumentSchema = new mongoose.Schema({
   exchange: String
 }, { timestamps: true });
 
+instrumentSchema.index({ exchangeToken: 1, symbol: 1 }, { unique: true });
 
-export const Auth = mongoose.model<InstrumentDocument>("Instrument", instrumentSchema);
+export const Instrument = mongoose.model<InstrumentDocument>("Instrument", instrumentSchema);

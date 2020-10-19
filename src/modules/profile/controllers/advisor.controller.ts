@@ -41,8 +41,6 @@ export const getAdvisorProfile = async (req: Request, res: Response, next: NextF
   }
 };
 
-
-
 export const createAdvisorProfile = async (req: Request<{}, {}, { investors: string[] }>, res: Response, next: NextFunction) => {
   try {
     await createAdvisorSchema.validateAsync(req.body);

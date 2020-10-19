@@ -68,7 +68,14 @@ const envSchema = Joi.object({
   MSG91_SENDERID: Joi.string()
     .default('FOLIYO'),
   MSG91_ROUTE: Joi.string()
-    .default('4')
+    .default('4'),
+  KITE_BASE_URL: Joi.string()
+    .when('NODE_ENV', {
+      is: Joi.string().equal(Environment.Development),
+      then: Joi.string().default("https://api.kite.trade"),
+      otherwise: Joi.string().required()
+        .description('Kite base url is required')
+    })
 
 }).unknown().required();
 
@@ -93,5 +100,8 @@ export const config = {
     authKey: env.MSG91_AUTHKEY,
     senderId: env.MSG91_SENDERID,
     route: env.MSG91_ROUTE
+  },
+  kite: {
+    baseUrl: env.KITE_BASE_URL
   }
 };
