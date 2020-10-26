@@ -28,5 +28,6 @@ const investorGroupSchema = new mongoose.Schema({
   }
 }, { timestamps: true });
 
+investorGroupSchema.index({ investors: 1 }, { unique: true });
 
 export const InvestorGroup = mongoose.model<InvestorGroupDocument>("InvestorGroup", investorGroupSchema);
