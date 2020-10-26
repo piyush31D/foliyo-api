@@ -50,10 +50,10 @@ KiteInstrumentSyncQ.isReady().then(() => {
                 name: instrument.name,
                 symbol: instrument.tradingsymbol,
                 lastPrice: parseInt(instrument.last_price),
-                expiry: moment(instrument.expiry).toISOString(),
+                ...(instrument.expiry && { expiry: moment(instrument.expiry).toISOString() }),
                 strike: instrument.strike,
                 tickSize: parseFloat(instrument.tick_size),
-                lotSize: parseInt(instrument.lot_size),
+                ...(instrument.lot_size && { lotSize: parseInt(instrument.lot_size) }),
                 instrumentType: instrument.instrument_type,
                 segment: instrument.segment,
                 exchange: instrument.exchange
