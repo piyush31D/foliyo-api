@@ -47,7 +47,8 @@ export const subscribeAdvisorSubscriptionPlan = async (req: Request, res: Respon
     }
     const investorSubscription = await InvestorSubscription.findOne({
       subscriptionPlan: subscriptionPlanId,
-      investor: investorId
+      investor: investorId,
+      subscriptionStatus: SubscriptionStatus.ACTIVE
     })
     if (investorSubscription) {
       throw new Error(INVESTOR_SUBSCRIPTION_EXISTS);
