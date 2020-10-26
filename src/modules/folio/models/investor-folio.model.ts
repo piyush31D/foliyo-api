@@ -19,7 +19,7 @@ const investorFolioSchema = new mongoose.Schema({
     required: true,
     ref: 'MasterFolio'
   },
-  constituents: [
+  instruments: [
     {
       name: {
         type: String,

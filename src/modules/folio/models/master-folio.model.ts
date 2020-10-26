@@ -26,28 +26,16 @@ const masterFolioSchema = new mongoose.Schema({
     type: mongoose.Types.ObjectId,
     ref: 'InvestorGroup'
   }],
-  constituents: [
+  exchange: {
+    type: String,
+    required: true,
+    default: "NSE"
+  },
+  instruments: [
     {
-      name: {
-        type: String,
-        required: true,
-      },
-      symbol: {
-        type: String,
-        required: true,
-      },
-      expiry: Date,
-      strike: {
-        type: String,
-        required: true,
-      },
-      segment: {
-        type: String,
-        required: true,
-      },
-      lotSize: {
-        type: Number,
-        default: 0
+      instrument: {
+        type: mongoose.Types.ObjectId,
+        ref: 'Instrument'
       },
       lots: {
         type: Number,
@@ -56,15 +44,12 @@ const masterFolioSchema = new mongoose.Schema({
       quantity: {
         type: Number,
         default: 0
-      },
-      instrumentType: {
-        type: String,
-        required: true,
       }
     }
   ],
   masterTrades: []
 }, { timestamps: true });
 
+masterFolioSchema.index({ "instruments.symbol": 1 }, { unique: true });
 
 export const MasterFolio = mongoose.model<MasterFolioDocument>("MasterFolio", masterFolioSchema);

@@ -7,11 +7,11 @@ export interface IMasterFolio {
   name: string;
   investors: mongoose.Types.ObjectId[];
   investorGroups: mongoose.Types.ObjectId[];
-  constituents: IConstituent[];
+  instruments: IFolioInstrument[];
   masterTrades: string[];
 };
 
-export interface IConstituent {
+export interface IFolioInstrument {
   name: string;
   symbol: string;
   lastPrice: number;
@@ -29,6 +29,6 @@ export interface IInvestorFolio {
   masterFolio: string;
   investor: mongoose.Types.ObjectId;
   user: mongoose.Types.ObjectId;
-  constituents: IConstituent[];
+  constituents: IFolioInstrument[];
   trades: IInvestorTrade[];
 };
