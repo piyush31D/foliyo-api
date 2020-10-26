@@ -113,7 +113,7 @@ export const getAllSubscriptions = async (req: Request<{ investorId: string }, {
     if (subscriptionStatus) {
       filterQuery.subscriptionStatus = subscriptionStatus;
     }
-    const subscriptions = await InvestorSubscription.find();
+    const subscriptions = await InvestorSubscription.find(filterQuery);
     return res.json({ success: true, data: { subscriptions } });
   } catch (error) {
     logger.error(error.message);
